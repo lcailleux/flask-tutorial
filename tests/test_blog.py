@@ -19,7 +19,7 @@ def test_index(client, auth):
 @pytest.mark.parametrize('path', (
     '/create',
     '/1/update',
-    '/1/delete'
+    '/1/delete',
 ))
 def test_login_required(client, path):
     response = client.post(path)
@@ -57,7 +57,7 @@ def test_create(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        count = db.execute('SELECT * FROM post WHERE id = 1').fetchone()[0]
+        count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
         assert count == 2
 
 

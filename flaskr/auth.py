@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, escape, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from flaskr.db import get_db
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -16,7 +16,7 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute(
-            "SELECT * from USER WHERE id = ?", (user_id,)
+            'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
 
 
@@ -27,15 +27,14 @@ def login():
         password = request.form['password']
         db = get_db()
         error = None
-
         user = db.execute(
-            "SELECT * from USER where username = ?", (username,)
+            'SELECT * FROM user WHERE username = ?', (username,)
         ).fetchone()
 
         if user is None:
-            'Incorrect username.'
+            error = 'Incorrect username.'
         elif not check_password_hash(user['password'], password):
-            'Incorrect password.'
+            error = 'Incorrect password.'
 
         if error is None:
             session.clear()
@@ -63,20 +62,20 @@ def register():
 
         if not username:
             error = 'Username is required.'
-        if not password:
+        elif not password:
             error = 'Password is required.'
 
         if error is None:
             try:
                 db.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password))
+                    'INSERT INTO user (username, password) VALUES (?, ?)',
+                    (username, generate_password_hash(password)),
                 )
                 db.commit()
             except db.IntegrityError:
-                error = f"User {escape(username)} is already registered."
+                error = f'User {username} is already registered.'
             else:
-                return redirect(url_for('auth.login'))
+                return redirect(url_for("auth.login"))
 
         flash(error)
 

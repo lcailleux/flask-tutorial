@@ -1,5 +1,5 @@
 from flaskr import create_app
-from flaskr import get_db, init_db
+from flaskr.db import get_db, init_db
 import os
 import tempfile
 import pytest
@@ -33,12 +33,12 @@ def app():
 
     app = create_app({
         'TESTING': True,
-        'DATABASE': db_path
+        'DATABASE': db_path,
     })
 
     with app.app_context():
         init_db()
-        get_db.executescript(_data_sql)
+        get_db().executescript(_data_sql)
 
     yield app
 

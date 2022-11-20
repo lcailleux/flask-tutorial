@@ -47,13 +47,11 @@ def create():
 
 
 @bp.route('/<int:id>/delete', methods=('POST',))
+@login_required
 def delete(id):
     get_post(id)
     db = get_db()
-    db.execute(
-        'DELETE from post WHERE id = ?',
-        (id,)
-    )
+    db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('blog.index'))
 
@@ -87,10 +85,9 @@ def update(id):
 
 
 def get_post(id, check_author=True):
-    db = get_db()
-    post = db.execute(
-        'SELECT p.id, title, body, created,author_id, username'
-        ' FROM post p  JOIN user u ON p.author_id = u.id'
+    post = get_db().execute(
+        'SELECT p.id, title, body, created, author_id, username'
+        ' FROM post p JOIN user u ON p.author_id = u.id'
         ' WHERE p.id = ?',
         (id,)
     ).fetchone()
@@ -98,7 +95,7 @@ def get_post(id, check_author=True):
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
 
-    if check_author is True and post['author_id'] != g.user['id']:
+    if check_author and post['author_id'] != g.user['id']:
         abort(403)
 
     return post
